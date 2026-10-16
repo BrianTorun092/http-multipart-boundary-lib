@@ -22,3 +22,10 @@ The trade-off is that the body must be available in memory before the boundary i
 Bodies are decoded as UTF-8 with the replacement character (`U+FFFD`) substituted for invalid byte sequences. Because the replacement character is outside the boundary alphabet, invalid UTF-8 in a binary body cannot cause a false collision. `Uint8Array` and `string` bodies are both accepted. The random source is injectable as the second argument to `generateBoundary(body, rng)` so tests can be deterministic; it defaults to `Math.random`.
 
 The RNG contract is the same as `Math.random`: a function returning a float in `[0, 1)`. If the provided RNG is broken (for example, it always returns the same value) and the resulting candidate collides with the body, the generator throws after 1000 attempts rather than looping forever.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
